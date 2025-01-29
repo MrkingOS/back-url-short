@@ -54,7 +54,7 @@ router.get('/:shortId', async (req, res) => {
     const url = await Url.findOne({ shortId });
 
     if (!url) {
-      return res.status(404).json({ error: 'URL not found' });
+      return res.redirect(`http://localhost:3001?error=invalid-url`);
     }
 
     url.accessCount = (url.accessCount || 0) + 1;
@@ -62,8 +62,9 @@ router.get('/:shortId', async (req, res) => {
 
     res.redirect(url.longUrl);
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    res.redirect(`http://localhost:3001?error=server-error`);
   }
 });
+
 
 module.exports = router;
