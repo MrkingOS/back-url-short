@@ -8,43 +8,44 @@ const router = express.Router();
 router.post('/shorten', async (req, res) => {
   const { longUrl, customId } = req.body;
 
-  if (!validUrl.isUri(longUrl)) {
+  if (!isValidUrl(longUrl)) {
     return res.status(400).json({ error: 'Invalid URL' });
   }
 
   try {
-    let existingUrl = await Url.findOne({ longUrl });
+    let exUrl = await Url.findOne({ longUrl });
 
-    if (existingUrl) {
-      return res.json({ shortUrl: `${req.headers.host}/${existingUrl.shortId}` });
+    if (exUrl) {
+      return res.json({ shortUrl: `${req.headers.host}/${exUrl.shortId}` });
     }
 
-    let shortId = customId;
     if (customId) {
-      const pattern = /^[a-zA-Z0-9]{1,9}$/;
-      if (!pattern.test(customId)) {
-        return res.status(400).json({ error: 'Custom ID must be alphanumeric and no longer than 9 characters.' });
-      }
-
-      let existingCustomId = await Url.findOne({ shortId: customId });
-      if (existingCustomId) {
+      const existingcustomId = await Url.findOne({ shortId: customId });
+      if (existingcustomId) {
         return res.status(400).json({ error: 'Custom ID is already in use.' });
       }
     }
 
-    if (!shortId) {
-      shortId = shortid.generate();
-    }
-
+    const shortId = customId || generateShortId();
     const newUrl = new Url({ longUrl, shortId });
     await newUrl.save();
 
-    res.json({ shortUrl: `${req.headers.host}/${shortId}` });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(200).json({ shortUrl: `${req.protocol}://${req.get('host')}/${shortId}` });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+function isValidUrl(url) {
+  return validUrl.isUri(url);
+}
+
+function generateShortId() {
+  return shortid.generate();
+}
 
 // GET /:shortId
 router.get('/:shortId', async (req, res) => {
