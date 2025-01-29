@@ -22,7 +22,7 @@ router.post('/shorten', async (req, res) => {
     if (customId) {
       const existingcustomId = await Url.findOne({ shortId: customId });
       if (existingcustomId) {
-        return res.status(400).json({ error: 'Custom ID is already in use.' });
+        return res.status(409).json({ error: 'Custom ID is already in use.' });
       }
     }
 
