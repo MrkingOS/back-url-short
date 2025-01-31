@@ -30,7 +30,7 @@ router.post('/shorten', async (req, res) => {
     const newUrl = new Url({ longUrl, shortId });
     await newUrl.save();
 
-    res.status(200).json({ shortUrl: `${req.protocol}://${req.get('host')}/${shortId}` });
+    res.status(200).json({ shortUrl: `${req.get('host')}/${shortId}` });
 
   } catch (error) {
     console.error(error);
