@@ -55,7 +55,7 @@ router.get('/:shortId', async (req, res) => {
     const url = await Url.findOne({ shortId });
 
     if (!url) {
-      return res.redirect(`http://localhost:3001?error=invalid-url`);
+      return res.redirect(`https://front-url-short.vercel.app?error=invalid-url`);
     }
 
     url.accessCount = (url.accessCount || 0) + 1;
@@ -63,7 +63,7 @@ router.get('/:shortId', async (req, res) => {
 
     res.redirect(url.longUrl);
   } catch (err) {
-    res.redirect(`http://localhost:3001?error=server-error`);
+    res.redirect(`https://front-url-short.vercel.app?error=server-error`);
   }
 });
 
